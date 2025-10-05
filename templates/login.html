@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}Login{% endblock %}
+
+{% block content %}
+<style>
+    /* Custom style for the background and form transparency */
+    .auth-page {
+        background-size: cover;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .auth-card {
+        background-color: rgba(255, 255, 255, 0.95); /* Semi-transparent white */
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<div class="auth-page">
+    <div class="col-md-10 col-lg-5">
+        <div class="auth-card">
+            <h2 class="text-center mb-4 text-primary">Welcome Back!</h2>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control", placeholder="Enter your username") }}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.userpassword.label(class="form-label") }}
+                    {{ form.userpassword(class="form-control", placeholder="Password") }}
+                </div>
+
+                <div class="d-grid gap-2">
+                    {{ form.submit(class="btn btn-success btn-lg mt-3") }}
+                </div>
+            </form>
+            
+            <p class="text-center mt-4">
+                Don't have an account? <a href="{{ url_for('register') }}">Register here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

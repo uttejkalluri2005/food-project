@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+
+{% block content %}
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+    <div class="container-fluid">
+        <a class="navbar-brand fw-bold" href="{{ url_for('dashboard') }}"><i class="bi bi-chef-hat me-2"></i> Recipe Genius</a>
+        <div class="d-flex align-items-center">
+            <span class="navbar-text me-3 text-white-50 d-none d-sm-inline">
+                Welcome, <strong>{{ session.get('username', 'Guest') }}</strong>!
+            </span>
+            <a href="{{ url_for('logout') }}" class="btn btn-outline-danger btn-sm"><i class="bi bi-box-arrow-right me-1"></i> Logout</a>
+        </div>
+    </div>
+</nav>
+
+<div class="container my-5">
+    <header class="text-center mb-5">
+        <h1 class="display-5 text-success">What's Cooking, {{ session.get('username', 'User') }}? 🍳</h1>
+        <p class="lead text-muted">Enter the ingredients you have, and let's find the perfect recipe for you.</p>
+    </header>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10 col-xl-8">
+            <div class="card shadow-lg border-primary">
+                <div class="card-header bg-primary text-white p-3">
+                    <h4 class="mb-0"><i class="bi bi-basket-fill me-2"></i> Ingredient-Based Recipe Search</h4>
+                </div>
+                <div class="card-body p-4">
+                    <p class="card-text text-muted">Add your ingredients and their quantities below. The more accurate the quantity, the better the recipe result!</p>
+                    
+                    <form action="{{ url_for('generate_recipe') }}" method="POST">
+                        <div id="ingredient-list" class="mb-4">
+                            <div class="row mb-3 ingredient-item align-items-center border-bottom pb-2">
+                                <div class="col-5">
+                                    <label class="form-label visually-hidden">Ingredient Name</label>
+                                    <input type="text" name="ingredient_name_0" class="form-control" placeholder="Ingredient (e.g., Chicken Breast)" required>
+                                </div>
+                                <div class="col-5">
+                                    <label class="form-label visually-hidden">Quantity</label>
+                                    <input type="text" name="quantity_0" class="form-control" placeholder="Quantity (e.g., 500g, 1 cup)" required>
+                                </div>
+                                <div class="col-2 d-grid">
+                                    <button type="button" class="btn btn-outline-danger btn-sm remove-ingredient">Remove</button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between align-items-center pt-3">
+                            <button type="button" class="btn btn-outline-secondary" id="add-ingredient">
+                                <i class="bi bi-plus-circle-fill me-1"></i> Add Another Ingredient
+                            </button>
+                            <button type="submit" class="btn btn-success btn-lg shadow-sm">
+                                <i class="bi bi-send-fill me-2"></i> Generate Recipe
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer class="text-center p-3 bg-light mt-5 border-top">
+    <p class="text-muted small">&copy; 2025 Recipe Genius Project | Powered by Flask & Gemini API</p>
+</footer>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const ingredientList = document.getElementById('ingredient-list');
+        const addIngredientButton = document.getElementById('add-ingredient');
+
+        function addIngredientInput() {
+            // Determine the next index based on the number of existing items
+            const index = ingredientList.querySelectorAll('.ingredient-item').length; 
+
+            const newItem = document.createElement('div');
+            newItem.classList.add('row', 'mb-3', 'ingredient-item', 'align-items-center', 'border-bottom', 'pb-2');
+            newItem.innerHTML = `
+                <div class="col-5">
+                    <label class="form-label visually-hidden">Ingredient Name</label>
+                    <input type="text" name="ingredient_name_${index}" class="form-control" placeholder="Ingredient (e.g., Garlic)" required>
+                </div>
+                <div class="col-5">
+                    <label class="form-label visually-hidden">Quantity</label>
+                    <input type="text" name="quantity_${index}" class="form-control" placeholder="Quantity (e.g., 2 cloves)" required>
+                </div>
+                <div class="col-2 d-grid">
+                    <button type="button" class="btn btn-outline-danger btn-sm remove-ingredient">Remove</button>
+                </div>
+            `;
+            ingredientList.appendChild(newItem);
+        }
+
+        function removeIngredientInput(button) {
+            // Prevent removing the very last item
+            if (ingredientList.querySelectorAll('.ingredient-item').length > 1) {
+                button.closest('.ingredient-item').remove();
+                // Re-index after removal
+                reIndexIngredients();
+            } else {
+                // Optionally clear the last item instead of removing
+                const item = button.closest('.ingredient-item');
+                item.querySelector('[name^="ingredient_name"]').value = '';
+                item.querySelector('[name^="quantity"]').value = '';
+                alert("You must have at least one ingredient.");
+            }
+        }
+
+        function reIndexIngredients() {
+            const items = ingredientList.querySelectorAll('.ingredient-item');
+            items.forEach((item, index) => {
+                // Find input fields based on their type
+                const nameInput = item.querySelector('[name^="ingredient_name"]');
+                const quantityInput = item.querySelector('[name^="quantity"]');
+                
+                // Update the 'name' attributes
+                if (nameInput) {
+                    nameInput.name = `ingredient_name_${index}`;
+                }
+                if (quantityInput) {
+                    quantityInput.name = `quantity_${index}`;
+                }
+            });
+        }
+
+        addIngredientButton.addEventListener('click', addIngredientInput);
+
+        // Event delegation for dynamically added remove buttons
+        ingredientList.addEventListener('click', function(e) {
+            if (e.target.classList.contains('remove-ingredient')) {
+                removeIngredientInput(e.target);
+            }
+        });
+        
+        // Initial setup check (to allow removal of the first item if more are added)
+        // Set the minimum required items to 1. The JS now prevents removal of the last item.
+    });
+</script>
+{% endblock %}

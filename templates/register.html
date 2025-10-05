@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<style>
+    /* Reuse the attractive auth styles */
+    .auth-page {
+        background-size: cover;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    .auth-card {
+        background-color: rgba(255, 255, 255, 0.95);
+        border-radius: 10px;
+        padding: 40px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+</style>
+
+<div class="auth-page">
+    <div class="col-md-10 col-lg-5">
+        <div class="auth-card">
+            <h2 class="text-center mb-4 text-primary">Create Your Account</h2>
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="form-control", placeholder="Choose a username") }}
+                    {% for error in form.username.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.useremail.label(class="form-label") }}
+                    {{ form.useremail(class="form-control", placeholder="name@example.com") }}
+                    {% for error in form.useremail.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                </div>
+                
+                <div class="mb-3">
+                    {{ form.userpassword.label(class="form-label") }}
+                    {{ form.userpassword(class="form-control", placeholder="Choose a strong password") }}
+                    {% for error in form.userpassword.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    {{ form.confi.label(class="form-label") }}
+                    {{ form.confi(class="form-control", placeholder="Confirm your password") }}
+                    {% for error in form.confi.errors %}<span class="text-danger">{{ error }}</span>{% endfor %}
+                </div>
+
+                <div class="d-grid gap-2">
+                    {{ form.submit(class="btn btn-success btn-lg mt-3") }}
+                </div>
+            </form>
+            
+            <p class="text-center mt-4">
+                Already have an account? <a href="{{ url_for('login') }}">Log in here</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}
